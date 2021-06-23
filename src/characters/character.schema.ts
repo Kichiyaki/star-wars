@@ -14,5 +14,4 @@ export class Character {
 }
 
 export type CharacterDocument = Character & Document;
-
 export const CharacterSchema = SchemaFactory.createForClass(Character);
