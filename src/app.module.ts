@@ -1,15 +1,10 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { CharactersModule } from './characters/characters.module';
+import createMongooseModule from './utils/createMongooseModule';
 
 @Module({
-  imports: [
-    MongooseModule.forRoot(
-      process.env.MONGODB_URI ?? 'mongodb://localhost/star-wars',
-    ),
-  ],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [createMongooseModule(process.env.MONGODB_URI), CharactersModule],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
