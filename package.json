@@ -2,9 +2,8 @@
   "name": "star-wars",
   "version": "0.0.1",
   "description": "",
-  "author": "",
-  "private": true,
-  "license": "UNLICENSED",
+  "author": "Kichiyaki <dawidwysokinski000@gmail.com>",
+  "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
