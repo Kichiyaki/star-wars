@@ -44,8 +44,8 @@ describe('characters', () => {
 
   it('should create a character', async () => {
     const dto = new CharacterDto();
-    const createdCharacter = await controller.create(dto);
-    expect(createdCharacter.save).toHaveBeenCalled();
+    const { character } = await controller.create(dto);
+    expect(character.save).toHaveBeenCalledTimes(1);
   });
 
   it('should fetch characters', async () => {

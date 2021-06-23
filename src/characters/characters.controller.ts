@@ -26,8 +26,12 @@ export class CharactersController {
 
   @Put('/:id')
   async update(@Param('id') id: string, @Body() dto: CharacterDto) {
+    const character = await this.characterService.update(id, dto);
+    if (!character) {
+      throw new NotFoundException('character not found');
+    }
     return {
-      character: await this.characterService.update(id, dto),
+      character: character,
     };
   }
 
