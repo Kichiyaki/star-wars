@@ -1,7 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-@Schema()
+@Schema({
+  toJSON: {
+    versionKey: false,
+  },
+})
 export class Character {
   @Prop({ required: true, unique: true })
   name: string;

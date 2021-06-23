@@ -9,47 +9,79 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+import { ApiProperty, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CharacterDto } from './dto/character.dto';
 import { CharactersService } from './characters.service';
 import { GetCharactersDto } from './dto/get-characters.dto';
+import { ApiCharactersSecurity } from './api-characters-security';
 
+class CharacterEntity extends CharacterDto {
+  @ApiProperty()
+  _id: string;
+}
+
+@ApiCharactersSecurity()
+@ApiTags('characters')
 @Controller('characters')
 export class CharactersController {
   constructor(private characterService: CharactersService) {}
 
   @Post()
+  @ApiResponse({
+    status: 201,
+    description: 'The character has been successfully created.',
+    type: CharacterEntity,
+  })
   async create(@Body() dto: CharacterDto) {
-    return {
-      character: await this.characterService.create(dto),
-    };
+    return await this.characterService.create(dto);
   }
 
   @Put('/:id')
+  @ApiResponse({
+    status: 200,
+    description: 'The character has been successfully updated.',
+    type: CharacterEntity,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Character not found.',
+  })
   async update(@Param('id') id: string, @Body() dto: CharacterDto) {
     const character = await this.characterService.update(id, dto);
     if (!character) {
       throw new NotFoundException('character not found');
     }
-    return {
-      character: character,
-    };
+    return character;
   }
 
   @Get()
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'offset', required: false, type: Number })
+  @ApiResponse({
+    status: 200,
+    description: 'The list of characters has been successfully generated.',
+    isArray: true,
+    type: CharacterEntity,
+  })
   async get(@Query() getCharactersDto: GetCharactersDto) {
-    return {
-      characters: await this.characterService.get(getCharactersDto),
-    };
+    return await this.characterService.get(getCharactersDto);
   }
 
   @Delete('/:id')
+  @ApiResponse({
+    status: 200,
+    description: 'The character has been successfully deleted.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Character not found.',
+    type: CharacterEntity,
+  })
   async delete(@Param('id') id: string) {
     const character = await this.characterService.delete(id);
     if (!character) {
       throw new NotFoundException('character not found');
     }
-    return {
-      character,
-    };
+    return character;
   }
 }
