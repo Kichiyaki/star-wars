@@ -48,7 +48,7 @@ describe('characters', () => {
     const spySave = jest
       .spyOn(mockedModel.prototype, 'save')
       .mockResolvedValue(character);
-    const { character: createdCharacter } = await controller.create(dto);
+    const createdCharacter = await controller.create(dto);
     expect(spySave).toHaveBeenCalledTimes(1);
     expect(createdCharacter).toEqual(character);
   });
@@ -59,7 +59,7 @@ describe('characters', () => {
       const spyFind = jest.spyOn(mockedModel, 'find').mockReturnValue(query);
       const spySkip = jest.spyOn(query, 'skip').mockReturnValue(query);
       const spyLimit = jest.spyOn(query, 'limit').mockResolvedValue([]);
-      const { characters } = await controller.get(dto);
+      const characters = await controller.get(dto);
       expect(characters).toHaveLength(0);
       expect(spyFind).toHaveBeenCalledTimes(1);
       expect(spySkip).toHaveBeenCalledTimes(1);
@@ -95,7 +95,7 @@ describe('characters', () => {
       const spyFindByIdAndUpdate = jest
         .spyOn(mockedModel, 'findByIdAndUpdate')
         .mockReturnValue(query);
-      const { character: updatedCharacter } = await controller.update(id, dto);
+      const updatedCharacter = await controller.update(id, dto);
       expect(spyExec).toHaveBeenCalledTimes(1);
       expect(spyFindByIdAndUpdate).toHaveBeenCalledTimes(1);
       expect(updatedCharacter).toEqual(character);
@@ -130,7 +130,7 @@ describe('characters', () => {
       const spyFindByIdAndDelete = jest
         .spyOn(mockedModel, 'findByIdAndDelete')
         .mockReturnValue(query);
-      const { character: deletedCharacter } = await controller.delete(id);
+      const deletedCharacter = await controller.delete(id);
       expect(spyExec).toHaveBeenCalledTimes(1);
       expect(spyFindByIdAndDelete).toHaveBeenCalledTimes(1);
       expect(deletedCharacter).toEqual(character);
