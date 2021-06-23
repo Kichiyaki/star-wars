@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { CreateCharacterDto } from './dto/create-character.dto';
 import { CharactersService } from './characters.service';
 import { GetCharactersDto } from './dto/get-characters.dto';
@@ -8,12 +17,27 @@ export class CharactersController {
   constructor(private characterService: CharactersService) {}
 
   @Post()
-  create(@Body() createCharacterDto: CreateCharacterDto) {
-    return this.characterService.create(createCharacterDto);
+  async create(@Body() createCharacterDto: CreateCharacterDto) {
+    return {
+      character: await this.characterService.create(createCharacterDto),
+    };
   }
 
   @Get()
-  get(@Query() getCharactersDto: GetCharactersDto) {
-    return this.characterService.get(getCharactersDto);
+  async get(@Query() getCharactersDto: GetCharactersDto) {
+    return {
+      characters: await this.characterService.get(getCharactersDto),
+    };
+  }
+
+  @Delete('/:id')
+  async delete(@Param('id') id: string) {
+    const character = await this.characterService.delete(id);
+    if (!character) {
+      throw new NotFoundException('character not found');
+    }
+    return {
+      character,
+    };
   }
 }

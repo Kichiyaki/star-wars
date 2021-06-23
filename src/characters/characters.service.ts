@@ -27,4 +27,8 @@ export class CharactersService {
     }
     return this.characterModel.find().skip(offset).limit(limit);
   }
+
+  async delete(id: string) {
+    return this.characterModel.findByIdAndDelete(id);
+  }
 }
