@@ -13,12 +13,14 @@ import { ApiProperty, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CharacterDto } from './dto/character.dto';
 import { CharactersService } from './characters.service';
 import { GetCharactersDto } from './dto/get-characters.dto';
+import { ApiCharactersSecurity } from './api-characters-security';
 
 class CharacterEntity extends CharacterDto {
   @ApiProperty()
   _id: string;
 }
 
+@ApiCharactersSecurity()
 @ApiTags('characters')
 @Controller('characters')
 export class CharactersController {

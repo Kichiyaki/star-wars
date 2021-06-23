@@ -8,6 +8,10 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
+    .addSecurity('basic', {
+      type: 'http',
+      scheme: 'basic',
+    })
     .setTitle('A Star Wars API')
     .setVersion('0.1')
     .build();
