@@ -1,8 +1,10 @@
 import {
   Body,
+  ConflictException,
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
   NotFoundException,
   Param,
   Post,
@@ -14,6 +16,7 @@ import { CharacterDto } from './dto/character.dto';
 import { CharactersService } from './characters.service';
 import { GetCharactersDto } from './dto/get-characters.dto';
 import { ApiCharactersSecurity } from './api-characters-security';
+import { CharacterDocument } from './character.schema';
 
 class CharacterEntity extends CharacterDto {
   @ApiProperty()
@@ -32,8 +35,19 @@ export class CharactersController {
     description: 'The character has been successfully created.',
     type: CharacterEntity,
   })
+  @ApiResponse({
+    status: 409,
+    description: 'The character name is not unique.',
+  })
   async create(@Body() dto: CharacterDto) {
-    return await this.characterService.create(dto);
+    try {
+      return await this.characterService.create(dto);
+    } catch (e) {
+      if (e.message.includes('duplicate key')) {
+        throw new ConflictException('name must be unique');
+      }
+      throw new InternalServerErrorException(e.message);
+    }
   }
 
   @Put('/:id')
@@ -46,8 +60,20 @@ export class CharactersController {
     status: 404,
     description: 'Character not found.',
   })
+  @ApiResponse({
+    status: 409,
+    description: 'The character name is not unique.',
+  })
   async update(@Param('id') id: string, @Body() dto: CharacterDto) {
-    const character = await this.characterService.update(id, dto);
+    let character: CharacterDocument;
+    try {
+      character = await this.characterService.update(id, dto);
+    } catch (e) {
+      if (e.message.includes('duplicate key')) {
+        throw new ConflictException('name must be unique');
+      }
+      throw new InternalServerErrorException(e.message);
+    }
     if (!character) {
       throw new NotFoundException('character not found');
     }
