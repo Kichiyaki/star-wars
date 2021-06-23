@@ -6,6 +6,9 @@ import { CharactersModule } from './characters/characters.module';
   imports: [
     MongooseModule.forRoot(
       process.env.MONGODB_URI ?? 'mongodb://localhost/star-wars',
+      {
+        useCreateIndex: true,
+      },
     ),
     CharactersModule,
   ],

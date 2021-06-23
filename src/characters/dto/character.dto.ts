@@ -1,6 +1,6 @@
 import { IsOptional, Length } from 'class-validator';
 
-export class CreateCharacterDto {
+export class CharacterDto {
   @Length(2, 64)
   name: string;
 

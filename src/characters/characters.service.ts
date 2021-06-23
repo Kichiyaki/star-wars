@@ -1,7 +1,7 @@
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { CreateCharacterDto } from './dto/create-character.dto';
+import { CharacterDto } from './dto/character.dto';
 import { Character, CharacterDocument } from './character.schema';
 import { GetCharactersDto, MAX_LIMIT } from './dto/get-characters.dto';
 
@@ -12,7 +12,7 @@ export class CharactersService {
     private characterModel: Model<CharacterDocument>,
   ) {}
 
-  async create(dto: CreateCharacterDto) {
+  async create(dto: CharacterDto) {
     return new this.characterModel(dto).save();
   }
 
@@ -30,5 +30,15 @@ export class CharactersService {
 
   async delete(id: string) {
     return this.characterModel.findByIdAndDelete(id);
+  }
+
+  async update(id: string, dto: CharacterDto) {
+    return this.characterModel.findByIdAndUpdate(
+      id,
+      {
+        $set: dto,
+      },
+      { new: true },
+    );
   }
 }

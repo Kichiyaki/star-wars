@@ -6,9 +6,10 @@ import {
   NotFoundException,
   Param,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
-import { CreateCharacterDto } from './dto/create-character.dto';
+import { CharacterDto } from './dto/character.dto';
 import { CharactersService } from './characters.service';
 import { GetCharactersDto } from './dto/get-characters.dto';
 
@@ -17,9 +18,16 @@ export class CharactersController {
   constructor(private characterService: CharactersService) {}
 
   @Post()
-  async create(@Body() createCharacterDto: CreateCharacterDto) {
+  async create(@Body() dto: CharacterDto) {
     return {
-      character: await this.characterService.create(createCharacterDto),
+      character: await this.characterService.create(dto),
+    };
+  }
+
+  @Put('/:id')
+  async update(@Param('id') id: string, @Body() dto: CharacterDto) {
+    return {
+      character: await this.characterService.update(id, dto),
     };
   }
 

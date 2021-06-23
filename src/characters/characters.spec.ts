@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { CharactersController } from './characters.controller';
 import { CharactersService } from './characters.service';
-import { CreateCharacterDto } from './dto/create-character.dto';
+import { CharacterDto } from './dto/character.dto';
 import { Character } from './character.schema';
 import { GetCharactersDto } from './dto/get-characters.dto';
 
@@ -43,7 +43,7 @@ describe('characters', () => {
   });
 
   it('should create a character', async () => {
-    const dto = new CreateCharacterDto();
+    const dto = new CharacterDto();
     const createdCharacter = await controller.create(dto);
     expect(createdCharacter.save).toHaveBeenCalled();
   });
