@@ -36,7 +36,7 @@ describe('characters', () => {
     );
   });
 
-  it('should controller and service be defined', () => {
+  it('should controller, service and model be defined', () => {
     expect(controller).toBeDefined();
     expect(service).toBeDefined();
     expect(mockedModel).toBeDefined();
@@ -102,7 +102,7 @@ describe('characters', () => {
       spyFindByIdAndUpdate.mockRestore();
     });
 
-    it('should throw error when character not found', async () => {
+    it(`should throw an error when a character doesn't exist`, async () => {
       const id = 'id';
       const dto = new CharacterDto();
       const query = new Query<CharacterDocument, CharacterDocument>();
@@ -137,7 +137,7 @@ describe('characters', () => {
       spyFindByIdAndDelete.mockRestore();
     });
 
-    it('should throw error when character not found', async () => {
+    it(`should throw an error when a character doesn't exist`, async () => {
       const id = 'id';
       const query = new Query<CharacterDocument, CharacterDocument>();
       const spyExec = jest.spyOn(query, 'exec').mockResolvedValue(null);
