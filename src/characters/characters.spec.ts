@@ -1,5 +1,7 @@
 import { Model, model, Query } from 'mongoose';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { MongoError } from 'mongodb';
 import { getModelToken } from '@nestjs/mongoose';
 import { CharactersController } from './characters.controller';
 import { CharactersService } from './characters.service';
@@ -10,7 +12,18 @@ import {
   CharacterSchema,
 } from './character.schema';
 import { GetCharactersDto, MAX_LIMIT } from './dto/get-characters.dto';
-import { NotFoundException } from '@nestjs/common';
+import {
+  MongoErrorCode,
+  MongooseErrorResolver,
+} from '../mongoose/mongoose-error-resolver';
+
+const getNameIsNotUniqueError = () => {
+  const err = new MongoError(
+    'MongoError E11000 duplicate key error collection: star-wars.characters index: name_1 dup key: { name: "string" }',
+  );
+  err.code = MongoErrorCode.DuplicateKey;
+  return err;
+};
 
 describe('characters', () => {
   let controller: CharactersController;
@@ -22,6 +35,7 @@ describe('characters', () => {
       controllers: [CharactersController],
       providers: [
         CharactersService,
+        MongooseErrorResolver,
         {
           provide: getModelToken(Character.name),
           useValue: model(Character.name, CharacterSchema, '', true),
@@ -42,15 +56,32 @@ describe('characters', () => {
     expect(mockedModel).toBeDefined();
   });
 
-  it('should create a character', async () => {
-    const character = new mockedModel();
-    const dto = new CharacterDto();
-    const spySave = jest
-      .spyOn(mockedModel.prototype, 'save')
-      .mockResolvedValue(character);
-    const createdCharacter = await controller.create(dto);
-    expect(spySave).toHaveBeenCalledTimes(1);
-    expect(createdCharacter).toEqual(character);
+  describe('create', () => {
+    it('should create a character', async () => {
+      const character = new mockedModel();
+      const dto = new CharacterDto();
+      const spySave = jest
+        .spyOn(mockedModel.prototype, 'save')
+        .mockResolvedValue(character);
+      const createdCharacter = await controller.create(dto);
+      expect(spySave).toHaveBeenCalledTimes(1);
+      expect(createdCharacter).toEqual(character);
+      spySave.mockRestore();
+    });
+
+    it(`should throw an error when a character name is not unique`, async () => {
+      const dto = new CharacterDto();
+      const spySave = jest
+        .spyOn(mockedModel.prototype, 'save')
+        .mockRejectedValue(getNameIsNotUniqueError());
+      try {
+        await controller.create(dto);
+      } catch (e) {
+        expect(e).toBeInstanceOf(ConflictException);
+      }
+      expect(spySave).toHaveBeenCalledTimes(1);
+      spySave.mockRestore();
+    });
   });
 
   describe('get', () => {
@@ -114,6 +145,26 @@ describe('characters', () => {
         await controller.update(id, dto);
       } catch (e) {
         expect(e).toBeInstanceOf(NotFoundException);
+      }
+      expect(spyExec).toHaveBeenCalledTimes(1);
+      expect(spyFindByIdAndUpdate).toHaveBeenCalledTimes(1);
+      spyFindByIdAndUpdate.mockRestore();
+    });
+
+    it(`should throw an error when a character name is not unique`, async () => {
+      const id = 'id';
+      const dto = new CharacterDto();
+      const query = new Query<CharacterDocument, CharacterDocument>();
+      const spyExec = jest
+        .spyOn(query, 'exec')
+        .mockRejectedValue(getNameIsNotUniqueError());
+      const spyFindByIdAndUpdate = jest
+        .spyOn(mockedModel, 'findByIdAndUpdate')
+        .mockReturnValue(query);
+      try {
+        await controller.update(id, dto);
+      } catch (e) {
+        expect(e).toBeInstanceOf(ConflictException);
       }
       expect(spyExec).toHaveBeenCalledTimes(1);
       expect(spyFindByIdAndUpdate).toHaveBeenCalledTimes(1);

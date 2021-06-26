@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { CharactersModule } from './characters/characters.module';
-import createMongooseModule from './utils/createMongooseModule';
+import { CustomMongooseModule } from './mongoose/mongoose.module';
 
 @Module({
-  imports: [createMongooseModule(process.env.MONGODB_URI), CharactersModule],
+  imports: [CharactersModule, CustomMongooseModule],
   controllers: [],
   providers: [],
 })

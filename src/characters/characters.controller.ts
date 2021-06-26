@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { ApiProperty, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CharacterDto } from './dto/character.dto';
+import { MongooseErrorResolver } from '../mongoose/mongoose-error-resolver';
 import { CharactersService } from './characters.service';
 import { GetCharactersDto } from './dto/get-characters.dto';
 import { ApiCharactersSecurity } from './api-characters-security';
@@ -27,7 +28,10 @@ class CharacterEntity extends CharacterDto {
 @ApiTags('characters')
 @Controller('characters')
 export class CharactersController {
-  constructor(private characterService: CharactersService) {}
+  constructor(
+    private characterService: CharactersService,
+    private mongooseErrorResolver: MongooseErrorResolver,
+  ) {}
 
   @Post()
   @ApiResponse({
@@ -43,10 +47,10 @@ export class CharactersController {
     try {
       return await this.characterService.create(dto);
     } catch (e) {
-      if (e.message.includes('duplicate key')) {
+      if (this.mongooseErrorResolver.isDuplicateKeyError(e, 'name')) {
         throw new ConflictException('name must be unique');
       }
-      throw new InternalServerErrorException(e.message);
+      throw new InternalServerErrorException();
     }
   }
 
@@ -69,10 +73,10 @@ export class CharactersController {
     try {
       character = await this.characterService.update(id, dto);
     } catch (e) {
-      if (e.message.includes('duplicate key')) {
+      if (this.mongooseErrorResolver.isDuplicateKeyError(e, 'name')) {
         throw new ConflictException('name must be unique');
       }
-      throw new InternalServerErrorException(e.message);
+      throw new InternalServerErrorException();
     }
     if (!character) {
       throw new NotFoundException('character not found');
