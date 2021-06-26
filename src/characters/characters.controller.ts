@@ -11,18 +11,14 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { ApiProperty, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CharacterDto } from './dto/character.dto';
 import { MongooseErrorResolver } from '../mongoose/mongoose-error-resolver';
 import { CharactersService } from './characters.service';
 import { GetCharactersDto } from './dto/get-characters.dto';
 import { ApiCharactersSecurity } from './api-characters-security';
 import { CharacterDocument } from './character.schema';
-
-class CharacterEntity extends CharacterDto {
-  @ApiProperty()
-  _id: string;
-}
+import { CharacterEntity } from './character-entity';
 
 @ApiCharactersSecurity()
 @ApiTags('characters')
