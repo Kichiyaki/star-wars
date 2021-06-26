@@ -1,7 +1,6 @@
 import { Model, model, Query } from 'mongoose';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { MongoError } from 'mongodb';
 import { getModelToken } from '@nestjs/mongoose';
 import { CharactersController } from './characters.controller';
 import { CharactersService } from './characters.service';
@@ -12,18 +11,10 @@ import {
   CharacterSchema,
 } from './character.schema';
 import { GetCharactersDto, MAX_LIMIT } from './dto/get-characters.dto';
-import {
-  MongoErrorCode,
-  MongooseErrorResolver,
-} from '../mongoose/mongoose-error-resolver';
+import { MongooseErrorResolver } from '../mongoose/mongoose-error-resolver';
+import { getDuplicateKeyError } from '../mongoose/mongoose-error-resolver.spec';
 
-const getNameIsNotUniqueError = () => {
-  const err = new MongoError(
-    'MongoError E11000 duplicate key error collection: star-wars.characters index: name_1 dup key: { name: "string" }',
-  );
-  err.code = MongoErrorCode.DuplicateKey;
-  return err;
-};
+const getNameIsNotUniqueError = () => getDuplicateKeyError('name');
 
 describe('characters', () => {
   let controller: CharactersController;
